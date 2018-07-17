@@ -10,8 +10,7 @@ import org.gradle.api.attributes.Attribute
 import java.io.Serializable
 
 enum class KotlinPlatformType: Named, Serializable {
-    common, jvm, js,
-    native; // TODO: split native into separate entries here or transform the enum to interface and implement entries in K/N
+    common, jvm, js, native;
 
     override fun toString(): String = name
     override fun getName(): String = name
