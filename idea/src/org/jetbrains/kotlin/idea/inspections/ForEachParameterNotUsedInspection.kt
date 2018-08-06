@@ -13,15 +13,12 @@ import org.jetbrains.kotlin.idea.caches.resolve.analyze
 import org.jetbrains.kotlin.idea.intentions.getCallableDescriptor
 import org.jetbrains.kotlin.idea.refactoring.getThisLabelName
 import org.jetbrains.kotlin.name.FqName
-import org.jetbrains.kotlin.psi.KtBlockExpression
-import org.jetbrains.kotlin.psi.KtElement
-import org.jetbrains.kotlin.psi.KtVisitorVoid
-import org.jetbrains.kotlin.psi.callExpressionVisitor
+import org.jetbrains.kotlin.psi.*
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.calls.callUtil.getResolvedCall
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameOrNull
 
-class ForEachParameterNotUsed : AbstractKotlinInspection() {
+class ForEachParameterNotUsedInspection : AbstractKotlinInspection() {
     companion object {
         private val COLLECTIONS_FOREACH_FQNAME = FqName("kotlin.collections.forEach")
         private val SEQUENCES_FOREACH_FQNAME = FqName("kotlin.sequences.forEach")
@@ -29,7 +26,9 @@ class ForEachParameterNotUsed : AbstractKotlinInspection() {
 
     override fun buildVisitor(holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor {
         return callExpressionVisitor {
-            when(it.getCallableDescriptor()?.fqNameOrNull()) {
+            val calleeExpression = it.calleeExpression as? KtNameReferenceExpression ?: return@callExpressionVisitor
+            if (calleeExpression.getReferencedName() != "forEach") return@callExpressionVisitor
+            when (it.getCallableDescriptor()?.fqNameOrNull()) {
                 COLLECTIONS_FOREACH_FQNAME, SEQUENCES_FOREACH_FQNAME -> {
                     val lambda = it.lambdaArguments.singleOrNull()?.getLambdaExpression() ?: return@callExpressionVisitor
                     val descriptor = lambda.analyze()[BindingContext.FUNCTION, lambda.functionLiteral] ?: return@callExpressionVisitor
