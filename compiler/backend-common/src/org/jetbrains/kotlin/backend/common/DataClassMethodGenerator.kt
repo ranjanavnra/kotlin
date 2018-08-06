@@ -105,8 +105,10 @@ abstract class DataClassMethodGenerator(protected val declaration: KtClassOrObje
 
     private val dataProperties: List<PropertyDescriptor>
         get() = primaryConstructorParameters
+            .asSequence()
             .filter { it.hasValOrVar() }
             .map { bindingContext.get(BindingContext.PRIMARY_CONSTRUCTOR_PARAMETER, it)!! }
+            .toList()
 
     private val primaryConstructorParameters: List<KtParameter>
         get() = (declaration as? KtClass)?.primaryConstructorParameters.orEmpty()

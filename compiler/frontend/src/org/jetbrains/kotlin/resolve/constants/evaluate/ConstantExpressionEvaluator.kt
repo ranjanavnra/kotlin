@@ -296,6 +296,7 @@ class ConstantExpressionEvaluator(
 
 private val DIVISION_OPERATION_NAMES =
     listOf(OperatorNameConventions.DIV, OperatorNameConventions.REM, OperatorNameConventions.MOD)
+        .asSequence()
         .map(Name::asString)
         .toSet()
 
